@@ -1,6 +1,7 @@
 package org.strives.todo.boundary;
 
 import io.smallrye.mutiny.Uni;
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
@@ -12,6 +13,7 @@ import org.strives.todo.entity.Todo;
 import java.util.List;
 
 @Path("/todo")
+@ApplicationScoped
 public class TodoResource {
 
     @Inject

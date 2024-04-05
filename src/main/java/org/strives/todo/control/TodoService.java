@@ -1,5 +1,7 @@
 package org.strives.todo.control;
 
+import io.quarkus.hibernate.reactive.panache.common.WithSession;
+import io.quarkus.hibernate.reactive.panache.common.WithTransaction;
 import io.smallrye.mutiny.Uni;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
@@ -24,6 +26,7 @@ public class TodoService {
     @Inject
     TodoRepository todoRepository;
 
+    @WithTransaction
     public Uni<Response> create(TodoRequestDTO todoRequestDTO) {
         Todo todo = todoMapper.toEntity(todoRequestDTO);
 
@@ -34,18 +37,21 @@ public class TodoService {
                 return Uni.createFrom().item(Response.notModified("Item is not persisted!").build());
             }
 
-            return Uni.createFrom().item(Response.ok(new SuccessResponse("Item successfully updated!", null)).build());
+            return Uni.createFrom().item(Response.ok(new SuccessResponse("Item successfully created!", null)).build());
         });
     }
 
+    @WithSession
     public Uni<List<Todo>> getAllTodoItems() {
         return todoRepository.listAll();
     }
 
+    @WithSession
     public Uni<Todo> getTodoItem(Long id) {
         return todoRepository.findById(id);
     }
 
+    @WithTransaction
     public Uni<Response> update(Long id, TodoRequestDTO todoRequestDTO) {
         return todoRepository.findById(id).flatMap(todo -> {
             if (!todoRequestDTO.getName().isEmpty()) {
@@ -68,6 +74,7 @@ public class TodoService {
         });
     }
 
+    @WithTransaction
     public Uni<Response> delete(Long id) {
         return todoRepository.deleteById(id).onItem().transformToUni(item -> {
             if (Boolean.FALSE.equals(item)) {
